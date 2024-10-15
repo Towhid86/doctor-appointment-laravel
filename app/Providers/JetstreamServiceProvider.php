@@ -25,6 +25,7 @@ class JetstreamServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        //check if user is doctor or not for login
          Fortify::authenticateUsing(function (Request $request){
             $user = User::where('email',$request->email)->first();
             if($user && Hash::check($request->password, $user->password) && $user->type == 'doctor'){
