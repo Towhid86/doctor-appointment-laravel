@@ -8,6 +8,7 @@ use App\Http\Controllers\Api;
     return $request->user();
 })->middleware('auth:sanctum');
  */
+Route::post('/register', [Api\UserController::class, 'register']);
 Route::post('/login',[Api\UserController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
