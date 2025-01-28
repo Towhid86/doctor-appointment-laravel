@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Doctor;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Resources\UserResource;
@@ -16,9 +17,27 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::findOrFail(auth()->id());
+        /* $user = User::findOrFail(auth()->id());
+        return response()->json($user); */
+        /*  $user = array();
+        $user = auth()->user();
+        $doctor = User::where('type', 'doctor')->get();
+        $doctorData = Doctor::all();
+        foreach ($doctorData as $data) {
+            foreach ($doctor as  $info) {
+                if ($data['doc_id'] == $info['id']) {
+                   $data['doctor_name'] = $info['name'];
+                   $data['doctor_profile'] = $info['profile_photo_url'];
+                }
+            }
+        }
+        $user['doctors'] = $doctorData; */
+        $user = auth()->user();
+        $user['doctors'] = Doctor::with(['user:id,name'])->get();
+
         return response()->json($user);
     }
+
 
     public function login(Request $request)
     {
@@ -54,7 +73,11 @@ class UserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'type' => 'user',
             'password' => bcrypt($request->password),
+        ]);
+        $user->userDetails()->create([
+            'status' => 'active',
         ]);
 
         $token = $user->createToken('api_token')->plainTextToken;
